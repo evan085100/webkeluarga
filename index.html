@@ -82,9 +82,10 @@
         .photo-card {
             background: white; padding: 12px; border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.3s;
+            cursor: pointer;
         }
 
-        .img-wrapper { width: 100%; height: 350px; overflow: hidden; border-radius: 10px; background: #eee; }
+        .img-wrapper { width: 100%; height: 350px; overflow: hidden; border-radius: 10px; background: #ddd; }
         .img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
         .photo-card:hover img { transform: scale(1.05); }
 
@@ -93,13 +94,14 @@
 
         /* Float Ornaments Background */
         .floating-ornament {
-            position: absolute; pointer-events: none; z-index: -1;
+            position: fixed; pointer-events: none; z-index: -1;
             font-size: 1.5rem; opacity: 0.15; animation: floatUp 15s linear infinite;
         }
         @keyframes floatUp {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            50% { opacity: 0.2; }
-            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.2; }
+            90% { opacity: 0.2; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
         }
 
         /* Scroll Buttons */
@@ -112,7 +114,7 @@
         }
         .btn-scroll.show { opacity: 1; visibility: visible; }
 
-        footer { background: var(--dark); color: white; padding: 60px 20px; text-align: center; clip-path: polygon(0 10%, 100% 0, 100% 100%, 0% 100%); }
+        footer { background: var(--dark); color: white; padding: 80px 20px; text-align: center; clip-path: polygon(0 10%, 100% 0, 100% 100%, 0% 100%); margin-top: 50px;}
     </style>
 </head>
 <body>
@@ -144,8 +146,7 @@
         <input type="text" id="photoSearch" placeholder="Cari nomor momen (1 - 112)...">
     </div>
 
-    <div class="container" id="gallery-grid">
-        </div>
+    <div class="container" id="gallery-grid"></div>
 
     <footer id="footer">
         <h2 style="font-family: 'Amiri'; font-size: 2rem;">Taqabbalallahu Minna Wa Minkum</h2>
@@ -153,7 +154,6 @@
     </footer>
 
     <script>
-        // Inisialisasi awal
         document.addEventListener('DOMContentLoaded', () => {
             AOS.init({ duration: 800, once: true });
             generateGallery();
@@ -167,7 +167,7 @@
             cursor.style.top = e.clientY + 'px';
         });
 
-        // 2. Generate Gallery (112 Foto)
+        // 2. Generate Gallery
         function generateGallery() {
             const container = document.getElementById('gallery-grid');
             const total = 112;
@@ -177,13 +177,14 @@
                 card.className = 'photo-card';
                 card.setAttribute('data-number', i);
                 card.setAttribute('data-aos', 'fade-up');
-                card.setAttribute('data-tilt', '');
-
-                const imgPath = `img/${i}.jpeg`;
+                
+                // Menggunakan "./" untuk memastikan path relatif benar saat deploy
+                const imgPath = `./img/${i}.jpeg`;
 
                 card.innerHTML = `
                     <div class="img-wrapper">
-                        <img src="${imgPath}" alt="Foto ${i}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x500?text=Momen+${i}'">
+                        <img src="${imgPath}" alt="Foto ${i}" loading="lazy" 
+                             onerror="this.onerror=null; this.src='./img/${i}.jpg'; this.setAttribute('data-fallback', 'true');">
                     </div>
                     <div class="card-body">
                         <h3>Momen #${i}</h3>
@@ -191,19 +192,21 @@
                     </div>
                 `;
 
-                // Event Klik untuk Zoom
-                card.onclick = () => {
+                card.onclick = function() {
+                    // Cek apakah gambar yang sedang tampil adalah .jpeg atau .jpg hasil fallback
+                    const currentImgSrc = this.querySelector('img').src;
+                    
                     Swal.fire({
-                        imageUrl: imgPath,
+                        imageUrl: currentImgSrc,
                         title: `<span style="font-family:Amiri; color:var(--sage)">Momen Indah #${i}</span>`,
                         confirmButtonText: 'Tutup',
                         confirmButtonColor: '#5d6d4e',
-                        customClass: { popup: 'animate__animated animate__fadeInUp' }
+                        showClass: { popup: 'animate__animated animate__fadeInUp' }
                     });
                 };
                 container.appendChild(card);
             }
-            // Aktifkan Efek Tilt 3D
+            
             VanillaTilt.init(document.querySelectorAll(".photo-card"), {
                 max: 10,
                 speed: 400,
@@ -222,14 +225,14 @@
             });
         });
 
-        // 4. Tombol Scroll Ke Atas
+        // 4. Scroll Buttons
         const scTop = document.getElementById('scrollTop');
         window.onscroll = () => {
             if (window.scrollY > 600) scTop.classList.add('show');
             else scTop.classList.remove('show');
         };
 
-        // 5. Animasi Latar Belakang (Ornamen Melayang)
+        // 5. Animasi Latar Belakang
         function initFloating() {
             const items = ['✨', '🌟', '🌙', '🍃', '🕌'];
             setInterval(() => {
@@ -239,7 +242,7 @@
                 el.style.left = Math.random() * 95 + 'vw';
                 document.body.appendChild(el);
                 setTimeout(() => el.remove(), 15000);
-            }, 4000);
+            }, 3000);
         }
     </script>
 </body>
