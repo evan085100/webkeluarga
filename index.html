@@ -179,12 +179,12 @@
                 card.setAttribute('data-aos', 'fade-up');
                 
                 // Menggunakan "./" untuk memastikan path relatif benar saat deploy
-                const imgPath = `./img/${i}.jpeg`;
+                const imgPath = `./${i}.jpeg`;
 
                 card.innerHTML = `
                     <div class="img-wrapper">
                         <img src="${imgPath}" alt="Foto ${i}" loading="lazy" 
-                             onerror="this.onerror=null; this.src='./img/${i}.jpg'; this.setAttribute('data-fallback', 'true');">
+                             onerror="this.onerror=null; this.src='./${i}.jpg'; this.setAttribute('data-fallback', 'true');">
                     </div>
                     <div class="card-body">
                         <h3>Momen #${i}</h3>
@@ -247,3 +247,4 @@
     </script>
 </body>
 </html>
+
